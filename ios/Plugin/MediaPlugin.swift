@@ -211,6 +211,54 @@ public class MediaPlugin: CAPPlugin {
         })
     }
 
+    @objc func saveDocument(_ call: CAPPluginCall) {
+        guard let data = call.getString("path") else {
+            call.reject("Must provide the data path")
+            return
+        }
+
+        let albumId = call.getString("album")
+        var targetCollection: PHAssetCollection?
+
+        if albumId != nil {
+            let albumFetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [albumId!], options: nil)
+            albumFetchResult.enumerateObjects({ (collection, count, _) in
+                targetCollection = collection
+            })
+            if targetCollection == nil {
+                call.reject("Unable to find that album")
+                return
+            }
+            if !targetCollection!.canPerform(.addContent) {
+                call.reject("Album doesn't support adding content (is this a smart album?)")
+                return
+            }
+        }
+
+        checkAuthorization(allowed: {
+            // Add it to the photo library.
+            PHPhotoLibrary.shared().performChanges({
+
+                let creationRequest = PHAssetChangeRequest.creationRequestForAssetFromImage(atFileURL: URL(string: data)!)
+
+                if let collection = targetCollection {
+                    let addAssetRequest = PHAssetCollectionChangeRequest(for: collection)
+                    addAssetRequest?.addAssets([creationRequest?.placeholderForCreatedAsset! as Any] as NSArray)
+                }
+
+            }, completionHandler: {success, error in
+                if !success {
+                    call.reject("Unable to save document to album")
+                } else {
+                    //TODO: return fileUri
+                    call.resolve()
+                }
+            })
+        }, notAllowed: {
+            call.reject("Access to photos not allowed by user")
+        })
+    }
+
     func checkAuthorization(allowed: @escaping () -> Void, notAllowed: @escaping () -> Void) {
         let status = PHPhotoLibrary.authorizationStatus()
         if status == PHAuthorizationStatus.authorized {
