@@ -26,8 +26,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 @CapacitorPlugin(
     name = "Media",
@@ -100,6 +103,19 @@ public class MediaPlugin extends Plugin {
     }
 
     @PluginMethod
+    public void saveDocument(PluginCall call) {
+        Log.d("DEBUG LOG", "SAVE DOCUMENT TO ALBUM");
+        if (isStoragePermissionGranted()) {
+            Log.d("DEBUG LOG", "HAS PERMISSION");
+            _saveMedia(call, "DOCUMENTS");
+        } else {
+            Log.d("DEBUG LOG", "NOT ALLOWED");
+            this.bridge.saveCall(call);
+            requestAllPermissions(call, "permissionCallback");
+        }
+    }
+
+    @PluginMethod
     public void createAlbum(PluginCall call) {
         Log.d("DEBUG LOG", "CREATE ALBUM");
         if (isStoragePermissionGranted()) {
@@ -135,6 +151,9 @@ public class MediaPlugin extends Plugin {
                 break;
             case "saveGif":
                 _saveMedia(call, "PICTURES");
+                break;
+            case "saveDocument":
+                _saveMedia(call, "DOCUMENTS");
                 break;
             case "createAlbum":
                 _createAlbum(call);
@@ -262,11 +281,12 @@ public class MediaPlugin extends Plugin {
         }
 
         String absolutePath = inputFile.getAbsolutePath();
-        String extension = absolutePath.substring(absolutePath.lastIndexOf("."));
+        String baseName = inputFile.getName().replaceFirst("[.][^.]+$", "");
+        String extension = absolutePath.substring(absolutePath.lastIndexOf(".") + 1).toLowerCase();
 
         // generate image file name using current date and time
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmssSSS").format(new Date());
-        File newFile = new File(albumDir, "IMG_" + timeStamp + extension);
+        File newFile = new File(albumDir, toSlug(baseName) + "_" + timeStamp + "." + extension);
 
         // Read and write image files
         FileChannel inChannel = null;
@@ -314,5 +334,21 @@ public class MediaPlugin extends Plugin {
         Uri contentUri = Uri.fromFile(imageFile);
         mediaScanIntent.setData(contentUri);
         bridge.getActivity().sendBroadcast(mediaScanIntent);
+    }
+
+    private String toSlug(String input) {
+        Pattern NONLATIN = Pattern.compile("[^\\w_-]");
+        Pattern SEPARATORS = Pattern.compile("[\\s\\p{Punct}&&[^-]]");
+
+        String noseparators = SEPARATORS.matcher(input).replaceAll("-");
+        String normalized = Normalizer.normalize(noseparators, Normalizer.Form.NFD);
+        String slug = NONLATIN
+            .matcher(normalized)
+            .replaceAll("")
+            .toLowerCase(Locale.ENGLISH)
+            .replaceAll("-{2,}", "-")
+            .replaceAll("^-|-$", "");
+
+        return slug;
     }
 }
