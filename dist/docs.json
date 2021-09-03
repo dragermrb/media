@@ -1,0 +1,456 @@
+{
+  "api": {
+    "name": "MediaPlugin",
+    "slug": "mediaplugin",
+    "docs": "",
+    "tags": [],
+    "methods": [
+      {
+        "name": "getMedias",
+        "signature": "(options?: MediaFetchOptions | undefined) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaFetchOptions | undefined"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaFetchOptions",
+          "MediaResponse"
+        ],
+        "slug": "getmedias"
+      },
+      {
+        "name": "getAlbums",
+        "signature": "() => any",
+        "parameters": [],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaAlbumResponse"
+        ],
+        "slug": "getalbums"
+      },
+      {
+        "name": "savePhoto",
+        "signature": "(options?: MediaSaveOptions | undefined) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaSaveOptions | undefined"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaSaveOptions",
+          "PhotoResponse"
+        ],
+        "slug": "savephoto"
+      },
+      {
+        "name": "saveVideo",
+        "signature": "(options?: MediaSaveOptions | undefined) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaSaveOptions | undefined"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaSaveOptions",
+          "PhotoResponse"
+        ],
+        "slug": "savevideo"
+      },
+      {
+        "name": "saveGif",
+        "signature": "(options?: MediaSaveOptions | undefined) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaSaveOptions | undefined"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaSaveOptions",
+          "PhotoResponse"
+        ],
+        "slug": "savegif"
+      },
+      {
+        "name": "saveDocument",
+        "signature": "(options?: MediaSaveOptions | undefined) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaSaveOptions | undefined"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaSaveOptions",
+          "PhotoResponse"
+        ],
+        "slug": "savedocument"
+      },
+      {
+        "name": "createAlbum",
+        "signature": "(options: MediaAlbumCreate) => any",
+        "parameters": [
+          {
+            "name": "options",
+            "docs": "",
+            "type": "MediaAlbumCreate"
+          }
+        ],
+        "returns": "any",
+        "tags": [],
+        "docs": "",
+        "complexTypes": [
+          "MediaAlbumCreate"
+        ],
+        "slug": "createalbum"
+      }
+    ],
+    "properties": []
+  },
+  "interfaces": [
+    {
+      "name": "MediaFetchOptions",
+      "slug": "mediafetchoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "quantity",
+          "tags": [],
+          "docs": "The number of photos to fetch, sorted by last created date descending",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "thumbnailWidth",
+          "tags": [],
+          "docs": "The width of thumbnail to return",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "thumbnailHeight",
+          "tags": [],
+          "docs": "The height of thumbnail to return",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "thumbnailQuality",
+          "tags": [],
+          "docs": "The quality of thumbnail to return as JPEG (0-100)",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "types",
+          "tags": [],
+          "docs": "Which types of assets to return (currently only supports \"photos\")",
+          "complexTypes": [],
+          "type": "string | undefined"
+        },
+        {
+          "name": "albumIdentifier",
+          "tags": [],
+          "docs": "Which album identifier to query in (get identifier with getAlbums())",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "MediaResponse",
+      "slug": "mediaresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "medias",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "MediaAsset"
+          ],
+          "type": "{}"
+        }
+      ]
+    },
+    {
+      "name": "MediaAsset",
+      "slug": "mediaasset",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "identifier",
+          "tags": [],
+          "docs": "Platform-specific identifier",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "data",
+          "tags": [],
+          "docs": "Data for a photo asset as a base64 encoded string (JPEG only supported)",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "creationDate",
+          "tags": [],
+          "docs": "ISO date string for creation date of asset",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "fullWidth",
+          "tags": [],
+          "docs": "Full width of original asset",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "fullHeight",
+          "tags": [],
+          "docs": "Full height of original asset",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "thumbnailWidth",
+          "tags": [],
+          "docs": "Width of thumbnail preview",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "thumbnailHeight",
+          "tags": [],
+          "docs": "Height of thumbnail preview",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "location",
+          "tags": [],
+          "docs": "Location metadata for the asset",
+          "complexTypes": [
+            "MediaLocation"
+          ],
+          "type": "MediaLocation"
+        }
+      ]
+    },
+    {
+      "name": "MediaLocation",
+      "slug": "medialocation",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "latitude",
+          "tags": [],
+          "docs": "GPS latitude image was taken at",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "longitude",
+          "tags": [],
+          "docs": "GPS longitude image was taken at",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "heading",
+          "tags": [],
+          "docs": "Heading of user at time image was taken",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "altitude",
+          "tags": [],
+          "docs": "Altitude of user at time image was taken",
+          "complexTypes": [],
+          "type": "number"
+        },
+        {
+          "name": "speed",
+          "tags": [],
+          "docs": "Speed of user at time image was taken",
+          "complexTypes": [],
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "name": "MediaAlbumResponse",
+      "slug": "mediaalbumresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "albums",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "MediaAlbum"
+          ],
+          "type": "{}"
+        }
+      ]
+    },
+    {
+      "name": "MediaAlbum",
+      "slug": "mediaalbum",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "identifier",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
+        },
+        {
+          "name": "name",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "count",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "number | undefined"
+        },
+        {
+          "name": "type",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [
+            "MediaAlbumType"
+          ],
+          "type": "MediaAlbumType | undefined"
+        }
+      ]
+    },
+    {
+      "name": "MediaSaveOptions",
+      "slug": "mediasaveoptions",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "path",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        },
+        {
+          "name": "album",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string | undefined"
+        }
+      ]
+    },
+    {
+      "name": "PhotoResponse",
+      "slug": "photoresponse",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "filePath",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "MediaAlbumCreate",
+      "slug": "mediaalbumcreate",
+      "docs": "",
+      "tags": [],
+      "methods": [],
+      "properties": [
+        {
+          "name": "name",
+          "tags": [],
+          "docs": "",
+          "complexTypes": [],
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "enums": [
+    {
+      "name": "MediaAlbumType",
+      "slug": "mediaalbumtype",
+      "members": [
+        {
+          "name": "Smart",
+          "value": "'smart'",
+          "tags": [],
+          "docs": "Album is a \"smart\" album (such as Favorites or Recently Added)"
+        },
+        {
+          "name": "Shared",
+          "value": "'shared'",
+          "tags": [],
+          "docs": "Album is a cloud-shared album"
+        },
+        {
+          "name": "User",
+          "value": "'user'",
+          "tags": [],
+          "docs": "Album is a user-created album"
+        }
+      ]
+    }
+  ]
+}
