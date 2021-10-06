@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Logger;
@@ -19,7 +18,6 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -174,10 +172,7 @@ public class MediaPlugin extends Plugin {
         JSArray albums = new JSArray();
         Set<String> bucketIds = new HashSet<String>();
 
-        String[] projection = new String[] {
-          MediaStore.MediaColumns.BUCKET_DISPLAY_NAME,
-          MediaStore.MediaColumns.BUCKET_ID
-        };
+        String[] projection = new String[] { MediaStore.MediaColumns.BUCKET_DISPLAY_NAME, MediaStore.MediaColumns.BUCKET_ID };
         Cursor cur = getActivity().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null, null, null);
 
         while (cur.moveToNext()) {

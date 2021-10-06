@@ -20,10 +20,10 @@ public class MediaPlugin: CAPPlugin {
     static let DEFAULT_TYPES = "photos"
     static let DEFAULT_THUMBNAIL_WIDTH = 256
     static let DEFAULT_THUMBNAIL_HEIGHT = 256
-
+    
     // Must be lazy here because it will prompt for permissions on instantiation without it
     lazy var imageManager = PHCachingImageManager()
-
+    
     @objc func getAlbums(_ call: CAPPluginCall) {
         checkAuthorization(allowed: {
             self.fetchAlbumsToJs(call)
@@ -31,7 +31,7 @@ public class MediaPlugin: CAPPlugin {
             call.reject("Access to photos not allowed by user")
         })
     }
-
+    
     @objc func getMedias(_ call: CAPPluginCall) {
         checkAuthorization(allowed: {
             self.fetchResultAssetsToJs(call)
@@ -39,7 +39,7 @@ public class MediaPlugin: CAPPlugin {
             call.reject("Access to photos not allowed by user")
         })
     }
-
+    
     @objc func createAlbum(_ call: CAPPluginCall) {
         guard let name = call.getString("name") else {
             call.reject("Must provide a name")
@@ -63,7 +63,7 @@ public class MediaPlugin: CAPPlugin {
             call.reject("Access to photos not allowed by user")
         })
     }
-
+    
     @objc func savePhoto(_ call: CAPPluginCall) {
         guard let data = call.getString("path") else {
             call.reject("Must provide the data path")
@@ -454,12 +454,12 @@ public class MediaPlugin: CAPPlugin {
             })
         }
     }
-
+    
     func fetchAlbumsToJs(_ call: CAPPluginCall) {
         var albums = [JSObject]()
-
+        
         let loadSharedAlbums = call.getBool("loadShared", false)
-
+        
         // Load our smart albums
         var fetchResult = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
         fetchResult.enumerateObjects({ (collection, count, stop: UnsafeMutablePointer<ObjCBool>) in
@@ -469,7 +469,7 @@ public class MediaPlugin: CAPPlugin {
             o["type"] = "smart"
             albums.append(o)
         })
-
+        
         if loadSharedAlbums {
             fetchResult = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumCloudShared, options: nil)
             fetchResult.enumerateObjects({ (collection, count, stop: UnsafeMutablePointer<ObjCBool>) in
@@ -480,7 +480,7 @@ public class MediaPlugin: CAPPlugin {
                 albums.append(o)
             })
         }
-
+        
         // Load our user albums
         PHCollectionList.fetchTopLevelUserCollections(with: nil).enumerateObjects({ (collection, count, stop: UnsafeMutablePointer<ObjCBool>) in
             var o = JSObject()
@@ -489,74 +489,72 @@ public class MediaPlugin: CAPPlugin {
             o["type"] = "user"
             albums.append(o)
         })
-
+        
         call.resolve([
             "albums": albums
-            ])
+        ])
     }
-
+    
     func fetchResultAssetsToJs(_ call: CAPPluginCall) {
         var assets: [JSObject] = []
-
+        
         let albumId = call.getString("albumIdentifier")
-
+        
         let quantity = call.getInt("quantity", MediaPlugin.DEFAULT_QUANTITY)
-
+        
         var targetCollection: PHAssetCollection?
-
+        
         let options = PHFetchOptions()
         options.fetchLimit = quantity
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-
+        
         if albumId != nil {
             let albumFetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [albumId!], options: nil)
             albumFetchResult.enumerateObjects({ (collection, count, _) in
                 targetCollection = collection
             })
         }
-
+        
         var fetchResult: PHFetchResult<PHAsset>;
         if targetCollection != nil {
             fetchResult = PHAsset.fetchAssets(in: targetCollection!, options: options)
         } else {
             fetchResult = PHAsset.fetchAssets(with: options)
         }
-
-        //let after = call.getString("after")
-
+        
         let types = call.getString("types") ?? MediaPlugin.DEFAULT_TYPES
         let thumbnailWidth = call.getInt("thumbnailWidth", MediaPlugin.DEFAULT_THUMBNAIL_WIDTH)
         let thumbnailHeight = call.getInt("thumbnailHeight", MediaPlugin.DEFAULT_THUMBNAIL_HEIGHT)
         let thumbnailSize = CGSize(width: thumbnailWidth, height: thumbnailHeight)
         let thumbnailQuality = call.getInt("thumbnailQuality", 95)
-
+        
         let requestOptions = PHImageRequestOptions()
         requestOptions.isNetworkAccessAllowed = true
         requestOptions.version = .current
         requestOptions.deliveryMode = .opportunistic
         requestOptions.isSynchronous = true
-
+        
         fetchResult.enumerateObjects({ (asset, count: Int, stop: UnsafeMutablePointer<ObjCBool>) in
-
+            
             if asset.mediaType == .image && types == "videos" {
                 return
             }
             if asset.mediaType == .video && types == "photos" {
                 return
             }
-
+            
             var a = JSObject()
-
+            
             self.imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: requestOptions, resultHandler: { (fetchedImage, _) in
                 guard let image = fetchedImage else {
                     return
                 }
-
+                
                 a["identifier"] = asset.localIdentifier
-
+                
                 // TODO: We need to know original type
                 a["data"] = image.jpegData(compressionQuality: CGFloat(thumbnailQuality) / 100.0)?.base64EncodedString()
-
+                
                 if asset.creationDate != nil {
                     a["creationDate"] = JSDate.toString(asset.creationDate!)
                 }
@@ -565,23 +563,23 @@ public class MediaPlugin: CAPPlugin {
                 a["thumbnailWidth"] = image.size.width
                 a["thumbnailHeight"] = image.size.height
                 a["location"] = self.makeLocation(asset)
-
+                
                 assets.append(a)
             })
         })
-
+        
         call.resolve([
             "medias": assets
-            ])
+        ])
     }
-
-
+    
+    
     func makeLocation(_ asset: PHAsset) -> JSObject {
         var loc = JSObject()
         guard let location = asset.location else {
             return loc
         }
-
+        
         loc["latitude"] = location.coordinate.latitude
         loc["longitude"] = location.coordinate.longitude
         loc["altitude"] = location.altitude
