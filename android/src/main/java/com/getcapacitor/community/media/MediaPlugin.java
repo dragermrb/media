@@ -184,13 +184,14 @@ public class MediaPlugin extends Plugin {
             String albumName = cur.getString((cur.getColumnIndex(MediaStore.MediaColumns.BUCKET_DISPLAY_NAME)));
             String bucketId = cur.getString((cur.getColumnIndex(MediaStore.MediaColumns.BUCKET_ID)));
 
-            if (!bucketIds.contains(bucketId)){
-              JSObject album = new JSObject();
+            if (!bucketIds.contains(bucketId)) {
+                JSObject album = new JSObject();
 
-              album.put("name", albumName);
-              albums.put(album);
+                album.put("identifier", bucketId);
+                album.put("name", albumName);
+                albums.put(album);
 
-              bucketIds.add(bucketId);
+                bucketIds.add(bucketId);
             }
         }
 
@@ -235,7 +236,7 @@ public class MediaPlugin extends Plugin {
         if (album != null) {
             albumDir = new File(albumPath, album);
         } else {
-            call.error("album name required");
+            call.reject("album name required");
         }
 
         Log.d("ENV LOG - ALBUM DIR", String.valueOf(albumDir));
@@ -270,14 +271,19 @@ public class MediaPlugin extends Plugin {
         if (!f.exists()) {
             if (!f.mkdir()) {
                 Log.d("DEBUG LOG", "___ERROR ALBUM");
-                call.error("Cant create album");
+                call.reject("Cant create album");
             } else {
                 Log.d("DEBUG LOG", "___SUCCESS ALBUM CREATED");
-                call.success();
+
+                JSObject album = new JSObject();
+
+                album.put("name", folderName);
+
+                call.success(album);
             }
         } else {
             Log.d("DEBUG LOG", "___ERROR ALBUM ALREADY EXISTS");
-            call.error("Album already exists");
+            call.reject("Album already exists");
         }
     }
 

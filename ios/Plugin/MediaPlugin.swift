@@ -45,17 +45,20 @@ public class MediaPlugin: CAPPlugin {
             call.reject("Must provide a name")
             return
         }
-
+        
         checkAuthorization(allowed: {
-            PHPhotoLibrary.shared().performChanges({
-                PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: name)
-            }, completionHandler: { success, error in
-                if !success {
+            self.createAlbumByName(name) { phAsset in
+                if phAsset == nil {
                     call.reject("Unable to create album")
                     return
+                } else {
+                    call.resolve([
+                        "identifier": phAsset?.localIdentifier as Any,
+                        "name": phAsset?.localizedTitle as Any,
+                    ])
+                    return
                 }
-                call.resolve()
-            })
+            }
         }, notAllowed: {
             call.reject("Access to photos not allowed by user")
         })
@@ -408,4 +411,41 @@ public class MediaPlugin: CAPPlugin {
         loc["speed"] = location.speed
         return loc
     }
+    
+    
+    func findAlbumById(_ id:String) -> PHAssetCollection? {
+        var targetCollection: PHAssetCollection?
+        
+        let albumFetchResult = PHAssetCollection.fetchAssetCollections(withLocalIdentifiers: [id], options: nil)
+        albumFetchResult.enumerateObjects({ (collection, count, _) in
+            targetCollection = collection
+        })
+        
+        
+        return targetCollection
+    }
+    
+    func createAlbumByName(_ albumName:String, completion: @escaping (_ phAsset: PHAssetCollection?) -> Void) -> Void{
+        
+        var albumPlaceholder: PHObjectPlaceholder?
+        var targetCollection: PHAssetCollection?
+        
+        PHPhotoLibrary.shared().performChanges({
+            let createAlbumRequest = PHAssetCollectionChangeRequest.creationRequestForAssetCollection(withTitle: albumName)
+            albumPlaceholder = createAlbumRequest.placeholderForCreatedAssetCollection
+        }, completionHandler: { success, error in
+            if (!success || albumPlaceholder == nil) {
+                completion(nil)
+            } else {
+                targetCollection = self.findAlbumById(albumPlaceholder!.localIdentifier)
+                
+                if targetCollection == nil {
+                    completion(nil)
+                } else {
+                    completion(targetCollection)
+                }
+            }
+        })
+    }
+    
 }
