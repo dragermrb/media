@@ -10,7 +10,10 @@ export interface MediaPlugin {
 
 export interface MediaSaveOptions {
   path: string;
-  album?: string;
+  album?: {
+    id?: string,
+    name?: string,
+  };
 }
 
 export interface MediaFetchOptions {
