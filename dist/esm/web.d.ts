@@ -1,5 +1,5 @@
 import { WebPlugin } from '@capacitor/core';
-import type { MediaAlbumCreate, MediaAlbumResponse, MediaFetchOptions, MediaPlugin, MediaResponse, MediaSaveOptions, PhotoResponse } from './definitions';
+import type { MediaAlbum, MediaAlbumCreate, MediaAlbumResponse, MediaFetchOptions, MediaPlugin, MediaResponse, MediaSaveOptions, PhotoResponse } from './definitions';
 export declare class MediaWeb extends WebPlugin implements MediaPlugin {
     getMedias(options?: MediaFetchOptions): Promise<MediaResponse>;
     getAlbums(): Promise<MediaAlbumResponse>;
@@ -7,5 +7,5 @@ export declare class MediaWeb extends WebPlugin implements MediaPlugin {
     saveVideo(options?: MediaSaveOptions): Promise<PhotoResponse>;
     saveGif(options?: MediaSaveOptions): Promise<PhotoResponse>;
     saveDocument(options?: MediaSaveOptions): Promise<PhotoResponse>;
-    createAlbum(options: MediaAlbumCreate): Promise<void>;
+    createAlbum(options: MediaAlbumCreate): Promise<MediaAlbum>;
 }

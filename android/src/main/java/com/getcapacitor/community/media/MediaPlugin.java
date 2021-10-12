@@ -18,6 +18,9 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
+
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -212,10 +215,17 @@ public class MediaPlugin extends Plugin {
             return;
         }
 
+        JSObject album = call.getObject("album", new JSObject());
+        String albumName = album.getString("name", null);
+
+        if (albumName == null){
+            call.reject("Album name is required");
+            return;
+        }
+
         Uri inputUri = Uri.parse(inputPath);
         File inputFile = new File(inputUri.getPath());
 
-        String album = call.getString("album");
         File albumDir = null;
         String albumPath;
         Log.d("SDK BUILD VERSION", String.valueOf(Build.VERSION.SDK_INT));
@@ -226,13 +236,7 @@ public class MediaPlugin extends Plugin {
             albumPath = Environment.getExternalStoragePublicDirectory(dest).getAbsolutePath();
         }
 
-        // Log.d("ENV LOG", String.valueOf(getContext().getExternalMediaDirs()));
-
-        if (album != null) {
-            albumDir = new File(albumPath, album);
-        } else {
-            call.reject("album name required");
-        }
+        albumDir = new File(albumPath, albumName);
 
         Log.d("ENV LOG - ALBUM DIR", String.valueOf(albumDir));
 
@@ -274,7 +278,7 @@ public class MediaPlugin extends Plugin {
 
                 album.put("name", folderName);
 
-                call.success(album);
+                call.resolve(album);
             }
         } else {
             Log.d("DEBUG LOG", "___ERROR ALBUM ALREADY EXISTS");

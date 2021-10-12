@@ -126,7 +126,8 @@
         "tags": [],
         "docs": "",
         "complexTypes": [
-          "MediaAlbumCreate"
+          "MediaAlbumCreate",
+          "MediaAlbum"
         ],
         "slug": "createalbum"
       }
@@ -390,7 +391,7 @@
           "tags": [],
           "docs": "",
           "complexTypes": [],
-          "type": "string | undefined"
+          "type": "{ id?: string | undefined; name?: string | undefined; } | undefined"
         }
       ]
     },

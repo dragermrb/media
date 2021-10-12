@@ -5,11 +5,14 @@ export interface MediaPlugin {
     saveVideo(options?: MediaSaveOptions): Promise<PhotoResponse>;
     saveGif(options?: MediaSaveOptions): Promise<PhotoResponse>;
     saveDocument(options?: MediaSaveOptions): Promise<PhotoResponse>;
-    createAlbum(options: MediaAlbumCreate): Promise<void>;
+    createAlbum(options: MediaAlbumCreate): Promise<MediaAlbum>;
 }
 export interface MediaSaveOptions {
     path: string;
-    album?: string;
+    album?: {
+        id?: string;
+        name?: string;
+    };
 }
 export interface MediaFetchOptions {
     /**
